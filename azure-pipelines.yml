@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'mi pc VS2022'
 
 variables:
   buildConfiguration: 'Release'
