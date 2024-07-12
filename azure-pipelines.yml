@@ -12,36 +12,54 @@ pool:
 variables:
   buildConfiguration: 'Release'
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    version: '6.x'
+stages:
+- stage: FrameworkAndPackages
+  displayName: 'Frameworks and packages'
 
-- task: NuGetToolInstaller@1
-  displayName: 'Use NuGet 6.0.0'
-  inputs:
-    versionSpec: 6.0.0    
+  jobs:
+    - job: FrameworkJob
+      steps:
+      - task: UseDotNet@2
+        inputs:
+          version: '6.x'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-    projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
+      - task: NuGetToolInstaller@1
+        displayName: 'Use NuGet 6.0.0'
+        inputs:
+          versionSpec: 6.0.0    
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    arguments: '--configuration $(buildConfiguration)'
-    workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'dotnet build $(buildConfiguration)'
+- stage: RestoreAndBuild
+  displayName: 'Restore And Build'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish Version'
-  inputs:
-    command: publish
-    projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
-    publishWebProjects: false
-    arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
+  jobs:
+    - job: RestoreAndBuildJob
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          feedsToUse: 'select'
+          projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
 
-- publish: '$(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
-  artifact: drop
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          arguments: '--configuration $(buildConfiguration)'
+          workingDirectory: '$(Build.SourcesDirectory)'
+        displayName: 'dotnet build $(buildConfiguration)'
+
+- stage: Publish
+  displayName: 'Publish'
+
+  jobs:
+    - job: PublishJob
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish Version'
+        inputs:
+          command: publish
+          projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
+          publishWebProjects: false
+          arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
+
+      - publish: '$(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
+        artifact: drop
