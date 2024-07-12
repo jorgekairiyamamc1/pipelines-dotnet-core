@@ -28,5 +28,19 @@ steps:
     feedsToUse: 'select'
     projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
 
-- script: dotnet build --configuration $(buildConfiguration)
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: '--configuration $(buildConfiguration)'
+    workingDirectory: '$(Build.SourcesDirectory)/PipelinesDotNetCore'
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Version'
+  inputs:
+    command: publish
+    projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
+    publishWebProjects: false
+    arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)'
+
+
