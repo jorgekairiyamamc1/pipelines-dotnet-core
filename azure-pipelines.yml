@@ -43,4 +43,5 @@ steps:
     publishWebProjects: false
     arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)'
 
-
+- publish: '$(Build.ArtifactStagingDirectory)'
+  artifact: drop
