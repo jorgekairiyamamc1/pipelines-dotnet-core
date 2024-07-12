@@ -13,5 +13,20 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    version: '6.x'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet 6.0.0'
+  inputs:
+    versionSpec: 6.0.0    
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+    projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
