@@ -41,7 +41,7 @@ steps:
     command: publish
     projects: '$(Build.SourcesDirectory)/pipelines-dotnet-core.csproj'
     publishWebProjects: false
-    arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) -r win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
 
 - publish: '$(Build.ArtifactStagingDirectory)/PipelinesDotNetCore'
   artifact: drop
